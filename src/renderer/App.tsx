@@ -8,7 +8,7 @@ function Hello() {
     name: string;
     currentTime: string;
     setTime: string;
-    status: boolean; // true = active (could be playing or paused), false = inactive (not playing)
+    status: boolean | string; // true = active, "paused" = timer is paused, false = inactive (not playing)
   }
 
   // setTime = the time the user sets on the timer
@@ -45,7 +45,7 @@ function Hello() {
     return { ...timer, setTime: newSetTime };
   }
 
-  function updateTimerStatus(timer: Timer, newStatus: boolean): Timer {
+  function updateTimerStatus(timer: Timer, newStatus: boolean | string): Timer {
     return { ...timer, status: newStatus };
   }
 
@@ -60,7 +60,9 @@ function Hello() {
       (seshBMinutes === '00' && seshBSeconds === '00')
     ) {
       alert('Please enter a valid time for Session A.');
+      return true;
     }
+    return false;
   }
 
   let timerStatusMessage = '';
@@ -68,11 +70,13 @@ function Hello() {
   const exitTimerScript = 'Would you like to exit? Doing so will stop the timer.';
 
   useEffect(() => {
-    if (seshATimer.currentTime === '00:00') {
+
+    if (seshATimer.currentTime === '00:00' && seshATimer.status === true) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+
       // Start Session B when Session A finishes
       setSeshBTimer((prev) => updateTimerStatus(prev, true));
       if (
@@ -83,10 +87,11 @@ function Hello() {
           updateTimerCurrentTime(prev, seshBTimer.setTime),
         );
       }
+      setSeshATimer((prev) => updateTimerStatus(prev, false));
       return;
     }
 
-    if (seshATimer.status && !intervalRef.current) {
+    if (seshATimer.status === true && !intervalRef.current) {
       intervalRef.current = setInterval(() => {
         setSeshATimer((prev) => {
           const [minutes, seconds] = prev.currentTime.split(':').map(Number);
@@ -111,7 +116,7 @@ function Hello() {
 
   // Handles Session B countdown and transition back to Session A
   useEffect(() => {
-    if (seshBTimer.currentTime === '00:00' && seshBTimer.status) {
+    if (seshBTimer.currentTime === '00:00' && seshBTimer.status === true) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -126,10 +131,11 @@ function Hello() {
           updateTimerCurrentTime(prev, seshATimer.setTime),
         );
       }
+      setSeshBTimer((prev) => updateTimerStatus(prev, false));
       return;
     }
 
-    if (seshBTimer.status && !intervalRef.current) {
+    if (seshBTimer.status === true && !intervalRef.current) {
       intervalRef.current = setInterval(() => {
         setSeshBTimer((prev) => {
           const [minutes, seconds] = prev.currentTime.split(':').map(Number);
@@ -154,18 +160,21 @@ function Hello() {
 
   function pauseTimer() {
     clearInterval(intervalRef);
+
   }
 
-  function resumeTimer() {}
+  function resumeTimer() {
+
+  }
 
   function restartTimer() {
     // TODO include a prompt to confirm if user wants to do this before the rest of the code runs
-    if (seshATimer.status && !seshBTimer.status) {
+    if (seshATimer.status === true && !seshBTimer.status) {
       setSeshATimer((prev) => {
         return updateTimerCurrentTime(prev, seshATimer.setTime);
       });
       timerStatusMessage = `${seshATimer.name} has stopped.`;
-    } else if (seshBTimer.status && !seshATimer.status) {
+    } else if (seshBTimer.status === true && !seshATimer.status) {
       setSeshBTimer((prev) => {
         return updateTimerCurrentTime(prev, seshBTimer.setTime);
       });
@@ -173,7 +182,19 @@ function Hello() {
     }
   }
 
+  function isEitherTimerActive() {
+    if (seshATimer.status === true || seshBTimer.status === true) {
+      return true;
+    }
+    return false;
+  }
+
   function startPomodoro() {
+    if (isEitherTimerActive()) {
+      alert('Timer already active');
+      return;
+    }
+
     const sessionAMinutesInput = document.getElementById(
       'session-a-minutes',
     ) as HTMLInputElement;
