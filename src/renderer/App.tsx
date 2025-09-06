@@ -28,6 +28,7 @@ function Hello() {
   });
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // const { timerIsPaused, setTimerIsPaused } = useState(false);
 
   // Helper functions for Timer interface
   function updateTimerName(timer: Timer, newName: string): Timer {
@@ -67,10 +68,10 @@ function Hello() {
 
   let timerStatusMessage = '';
   const stopTimerAlarmScript = 'Would you like to stop the current timer?';
-  const exitTimerScript = 'Would you like to exit? Doing so will stop the timer.';
+  const exitTimerScript =
+    'Would you like to exit? Doing so will stop the timer.';
 
   useEffect(() => {
-
     if (seshATimer.currentTime === '00:00' && seshATimer.status === true) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -105,13 +106,6 @@ function Hello() {
         });
       }, 1000);
     }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
   }, [seshATimer.status, seshATimer.currentTime, updateTimerCurrentTime]);
 
   // Handles Session B countdown and transition back to Session A
@@ -149,22 +143,28 @@ function Hello() {
         });
       }, 1000);
     }
+  }, [seshBTimer.status, seshBTimer.currentTime, updateTimerCurrentTime]);
 
-    return () => {
+  function pauseTimer() {
+    if (seshATimer.status === true || seshBTimer.status === true) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-    };
-  }, [seshBTimer.status, seshBTimer.currentTime, updateTimerCurrentTime]);
-
-  function pauseTimer() {
-    clearInterval(intervalRef);
-
+      if (seshATimer.status === true) {
+        setSeshATimer((prev) => updateTimerStatus(prev, 'paused'));
+      } else if (seshBTimer.status === true) {
+        setSeshBTimer((prev) => updateTimerStatus(prev, 'paused'));
+      }
+    }
   }
 
   function resumeTimer() {
-
+    if (seshATimer.status === 'paused') {
+      setSeshATimer((prev) => updateTimerStatus(prev, true));
+    } else if (seshBTimer.status === 'paused') {
+      setSeshBTimer((prev) => updateTimerStatus(prev, true));
+    }
   }
 
   function restartTimer() {
@@ -258,8 +258,11 @@ function Hello() {
       </button>
 
       <div className="timer-control-btns">
-        <button type="button" onClick={restartTimer}>Restart</button>
-        <button type="button">Resume</button>
+        <button type="button" onClick={restartTimer}>
+          Restart
+        </button>
+        <button type="button" onClick={pauseTimer}>Pause</button>
+        <button type="button" onClick={resumeTimer}>Resume</button>
         <button type="button">Skip</button>
       </div>
     </div>
