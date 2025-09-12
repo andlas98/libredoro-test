@@ -1,6 +1,7 @@
 /* eslint-disable no-alert */
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
+import Modal from './components/modal';
 import './App.css';
 
 function Hello() {
@@ -264,6 +265,7 @@ function Hello() {
         <button type="button" onClick={pauseTimer}>Pause</button>
         <button type="button" onClick={resumeTimer}>Resume</button>
         <button type="button">Skip</button>
+        <Modal />
       </div>
     </div>
   );
