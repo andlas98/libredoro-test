@@ -16,7 +16,7 @@ export default function Modal() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-md bg-white/10 px-2.5 py-1.5 text-sm font-semibold text-white inset-ring inset-ring-white/5 hover:bg-white/20"
+        className="rounded-md bg-white/10 px-2.5 py-1.5 text-sm font-semibold text-white ring-inset ring-white/5 hover:bg-white/20"
       >
         Open dialog
       </button>
@@ -34,7 +34,7 @@ export default function Modal() {
             >
               <div className="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-500/10 sm:mx-0 sm:size-10">
+                  <div className="mx-auto flex w-12 h-12 shrink-0 items-center justify-center rounded-full bg-red-500/10 sm:mx-0 sm:w-10 sm:h-10">
                     Icon
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">

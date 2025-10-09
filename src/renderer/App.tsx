@@ -51,19 +51,30 @@ function Hello() {
     return { ...timer, status: newStatus };
   }
 
-  function checkForInvalidSetTime(
+  function setTimeIsInvalid(
     seshAMinutes: String,
     seshASeconds: String,
     seshBMinutes: String,
     seshBSeconds: String,
   ) {
     if (
-      (seshAMinutes === '00' && seshASeconds === '00') ||
-      (seshBMinutes === '00' && seshBSeconds === '00')
+      seshAMinutes === '00' &&
+      seshASeconds === '00' &&
+      seshBMinutes === '00' &&
+      seshBSeconds === '00'
     ) {
-      alert('Please enter a valid time for Session A.');
+      alert('Please enter a valid time for the timers.');
       return true;
     }
+    if (seshAMinutes === '00' && seshASeconds === '00') {
+      alert(`Please enter a valid time for ${seshATimer.name}.`);
+      return true;
+    }
+    if (seshBMinutes === '00' && seshBSeconds === '00') {
+      alert(`Please enter a valid time for ${seshBTimer.name}.`);
+      return true;
+    }
+
     return false;
   }
 
@@ -160,6 +171,26 @@ function Hello() {
     }
   }
 
+  function skipTimer() {
+    if (seshATimer.status === true || seshBTimer.status === true) {
+      if (seshATimer.status === true && seshBTimer.status === false) {
+        setSeshBTimer((prev) => updateTimerStatus(prev, true));
+        setSeshATimer((prev) => updateTimerStatus(prev, false));
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      } else if (seshATimer.status === false && seshBTimer.status === true) {
+        setSeshATimer((prev) => updateTimerStatus(prev, true));
+        setSeshBTimer((prev) => updateTimerStatus(prev, false));
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      }
+    }
+  }
+
   function resumeTimer() {
     if (seshATimer.status === 'paused') {
       setSeshATimer((prev) => updateTimerStatus(prev, true));
@@ -214,12 +245,16 @@ function Hello() {
     const sessionBMinutes = sessionBMinutesInput?.value || '00';
     const sessionBSeconds = sessionBSecondsInput?.value || '00';
 
-    checkForInvalidSetTime(
-      sessionAMinutes,
-      sessionASeconds,
-      sessionBMinutes,
-      sessionBSeconds,
-    );
+    if (
+      setTimeIsInvalid(
+        sessionAMinutes,
+        sessionASeconds,
+        sessionBMinutes,
+        sessionBSeconds,
+      ) === true
+    ) {
+      return;
+    }
 
     const setTimeA = `${String(sessionAMinutes).padStart(2, '0')}:${String(sessionASeconds).padStart(2, '0')}`;
     const setTimeB = `${String(sessionBMinutes).padStart(2, '0')}:${String(sessionBSeconds).padStart(2, '0')}`;
@@ -243,16 +278,30 @@ function Hello() {
     <div>
       <p>{timerStatusMessage}</p>
       <div id="session-a-timer">
-        <p>Session A</p>
+        <p>{seshATimer.name}</p>
         <h1>{seshATimer.currentTime}</h1>
-        <input type="number" name="" id="session-a-minutes" />
-        <input type="number" name="" id="session-a-seconds" />
+        <input
+          type="number"
+          min="0"
+          max="99"
+          name=""
+          id="session-a-minutes"
+          className="mr-2"
+        />
+        <input type="number" min="0" max="59" name="" id="session-a-seconds" />
       </div>
       <div id="session-b-timer">
-        <p>Session B</p>
+        <p>{seshBTimer.name}</p>
         <h1>{seshBTimer.currentTime}</h1>
-        <input type="number" name="" id="session-b-minutes" />
-        <input type="number" name="" id="session-b-seconds" />
+        <input
+          type="number"
+          min="0"
+          max="99"
+          name=""
+          id="session-b-minutes"
+          className="mr-2"
+        />
+        <input type="number" min="0" max="59" name="" id="session-b-seconds" />
       </div>
       <button className="start-timer-btn" type="button" onClick={startPomodoro}>
         GO!
@@ -262,9 +311,15 @@ function Hello() {
         <button type="button" onClick={restartTimer}>
           Restart
         </button>
-        <button type="button" onClick={pauseTimer}>Pause</button>
-        <button type="button" onClick={resumeTimer}>Resume</button>
-        <button type="button">Skip</button>
+        <button type="button" onClick={pauseTimer}>
+          Pause
+        </button>
+        <button type="button" onClick={resumeTimer}>
+          Resume
+        </button>
+        <button type="button" onClick={skipTimer}>
+          Skip
+        </button>
         <Modal />
       </div>
     </div>
