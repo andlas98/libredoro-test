@@ -14,6 +14,8 @@ function Hello() {
   }
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [timerControlBtnsAreVisible, setTimerControlBtnsAreVisible] =
+    useState(false);
 
   // setTime = the time the user sets on the timer
   // currentTime = the time currently displaying on its corresponding timer, regardless of whether a timer is paused, active, or in another state
@@ -180,6 +182,8 @@ function Hello() {
     setSeshATimer((prev) => updateTimerCurrentTime(prev, seshATimer.setTime));
     setSeshBTimer((prev) => updateTimerStatus(prev, false));
     setSeshBTimer((prev) => updateTimerCurrentTime(prev, seshBTimer.setTime));
+
+    setTimerControlBtnsAreVisible(false);
   }
 
   function skipTimer() {
@@ -290,6 +294,25 @@ function Hello() {
     />
   );
 
+  const timerControlBtns = (<div className="timer-control-btns">
+      <button type="button" onClick={() => setModularModalKey('restart')}>
+        Restart
+      </button>
+      <button type="button" onClick={pauseTimer}>
+        Pause
+      </button>
+      <button type="button" onClick={resumeTimer}>
+        Resume
+      </button>
+      <button type="button" onClick={() => setModularModalKey('skip')}>
+        Skip
+      </button>
+      <button type="button" onClick={() => setModularModalKey('stop')}>
+        Stop
+      </button>
+    </div>
+  );
+
   function startPomodoro() {
     if (isEitherTimerActive()) {
       alert('Timer already active');
@@ -341,6 +364,7 @@ function Hello() {
       updated = updateTimerStatus(updated, false); // Do NOT start Session B yet
       return updated;
     });
+    setTimerControlBtnsAreVisible(true);
   }
 
   return (
@@ -376,24 +400,9 @@ function Hello() {
         GO!
       </button>
 
-      <div className="timer-control-btns">
-        <button type="button" onClick={() => setModularModalKey('restart')}>
-          Restart
-        </button>
-        <button type="button" onClick={pauseTimer}>
-          Pause
-        </button>
-        <button type="button" onClick={resumeTimer}>
-          Resume
-        </button>
-        <button type="button" onClick={() => setModularModalKey('skip')}>
-          Skip
-        </button>
-        <button type="button" onClick={() => setModularModalKey('stop')}>
-          Stop
-        </button>
-        {modularModal}
-      </div>
+      {timerControlBtnsAreVisible && timerControlBtns}
+
+      {modularModal}
     </div>
   );
 }
