@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
 import {
   Dialog,
   DialogBackdrop,
@@ -8,19 +8,26 @@ import {
   DialogTitle,
 } from '@headlessui/react';
 
-export default function Modal() {
-  const [open, setOpen] = useState(false);
+interface ModalProps {
+  open: boolean | string | null;
+  onClose: (() => void) | ((open: boolean) => void);
+  onConfirm?: () => void;
+  modalTitle?: string;
+  modalBody?: string;
+  button1Text?: string;
+}
 
+export default function Modal({
+  open,
+  onClose,
+  onConfirm,
+  modalTitle = 'Modal Title',
+  modalBody = 'Modal Body',
+  button1Text = 'Button 1 text',
+}: ModalProps) {
   return (
     <div>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="rounded-md bg-white/10 px-2.5 py-1.5 text-sm font-semibold text-white ring-inset ring-white/5 hover:bg-white/20"
-      >
-        Open dialog
-      </button>
-      <Dialog open={open} onClose={setOpen} className="relative z-100">
+      <Dialog open={open} onClose={onClose} className="relative z-100">
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -40,15 +47,13 @@ export default function Modal() {
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                     <DialogTitle
                       as="h3"
-                      className="text-base font-semibold text-white"
+                      className="modalTitle text-base font-semibold text-white"
                     >
-                      Deactivate account
+                      {modalTitle}
                     </DialogTitle>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-400">
-                        Are you sure you want to deactivate your account? All of
-                        your data will be permanently removed. This action
-                        cannot be undone.
+                      <p className="modalBody text-sm text-gray-400">
+                        {modalBody}
                       </p>
                     </div>
                   </div>
@@ -57,15 +62,18 @@ export default function Modal() {
               <div className="bg-gray-700/25 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                 <button
                   type="button"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    if (onConfirm) onConfirm();
+                    onClose(false);
+                  }}
                   className="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 sm:ml-3 sm:w-auto"
                 >
-                  Deactivate
+                  <p className="button1Text">{button1Text}</p>
                 </button>
                 <button
                   type="button"
                   data-autofocus
-                  onClick={() => setOpen(false)}
+                  onClick={() => onClose(false)}
                   className="mt-3 inline-flex w-full justify-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white inset-ring inset-ring-white/5 hover:bg-white/20 sm:mt-0 sm:w-auto"
                 >
                   Cancel

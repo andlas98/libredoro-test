@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-alert */
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
@@ -11,6 +12,8 @@ function Hello() {
     setTime: string;
     status: boolean | string; // true = active, "paused" = timer is paused, false = inactive (not playing)
   }
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // setTime = the time the user sets on the timer
   // currentTime = the time currently displaying on its corresponding timer, regardless of whether a timer is paused, active, or in another state
@@ -28,7 +31,23 @@ function Hello() {
     status: false,
   });
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  let timerStatusMessage = '';
+  const stopTimerAlarmScript = {
+    title: '',
+    body: 'Would you like to stop the current timer?',
+    button1Text: 'Yes',
+  };
+  const restartTimerAlarmScript = {
+    title: '',
+    body: 'Would you like to restart the current timer?',
+    button1Text: 'Yes',
+  };
+  const exitTimerScript = {
+    title: '',
+    body: 'Would you like to exit? Doing so will stop the timer.',
+    button1Text: 'Yes',
+  };
+
   // const { timerIsPaused, setTimerIsPaused } = useState(false);
 
   // Helper functions for Timer interface
@@ -77,11 +96,6 @@ function Hello() {
 
     return false;
   }
-
-  let timerStatusMessage = '';
-  const stopTimerAlarmScript = 'Would you like to stop the current timer?';
-  const exitTimerScript =
-    'Would you like to exit? Doing so will stop the timer.';
 
   useEffect(() => {
     if (seshATimer.currentTime === '00:00' && seshATimer.status === true) {
@@ -171,6 +185,17 @@ function Hello() {
     }
   }
 
+  function stopTimer() {
+    // Stop/exit behavior: clear interval and stop both timers
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setSeshATimer((prev) => updateTimerStatus(prev, false));
+    setSeshBTimer((prev) => updateTimerStatus(prev, false));
+    setModularModalKey(null);
+  }
+
   function skipTimer() {
     if (seshATimer.status === true || seshBTimer.status === true) {
       if (seshATimer.status === true && seshBTimer.status === false) {
@@ -200,7 +225,7 @@ function Hello() {
   }
 
   function restartTimer() {
-    // TODO include a prompt to confirm if user wants to do this before the rest of the code runs
+    // Modal pops up before this code runs. onConfirm, code runs
     if (seshATimer.status === true && !seshBTimer.status) {
       setSeshATimer((prev) => {
         return updateTimerCurrentTime(prev, seshATimer.setTime);
@@ -220,6 +245,55 @@ function Hello() {
     }
     return false;
   }
+
+  const [modularModalKey, setModularModalKey] = useState<
+    'stop' | 'exit' | 'restart' | 'skip' | null
+  >(null);
+
+  // compute modal text values so props receive strings (not functions)
+  const modalTitleText: string =
+    modularModalKey === 'stop'
+      ? stopTimerAlarmScript.title || 'Stop current timer?'
+      : modularModalKey === 'restart'
+        ? restartTimerAlarmScript.title || 'Restart current timer?'
+        : modularModalKey === 'exit'
+          ? exitTimerScript.title || 'Exit?'
+          : '';
+
+  const modalBodyText: string =
+    modularModalKey === 'stop'
+      ? stopTimerAlarmScript.body
+      : modularModalKey === 'exit'
+        ? exitTimerScript.body
+        : '';
+
+  const modalButton1Text: string =
+    modularModalKey === 'stop'
+      ? stopTimerAlarmScript.button1Text || 'Yes'
+      : modularModalKey === 'exit'
+        ? exitTimerScript.button1Text || 'Yes'
+        : 'Yes';
+
+  const modularModal = (
+    <Modal
+      open={modularModalKey !== null}
+      onClose={() => setModularModalKey(null)}
+      onConfirm={() => {
+        if (modularModalKey === 'stop') {
+          stopTimer();
+        }
+        if (modularModalKey === 'restart') {
+          restartTimer();
+        }
+        if (modularModalKey === 'skip') {
+          skipTimer();
+        }
+      }}
+      modalTitle={modalTitleText}
+      modalBody={modalBodyText}
+      button1Text={modalButton1Text}
+    />
+  );
 
   function startPomodoro() {
     if (isEitherTimerActive()) {
@@ -308,7 +382,7 @@ function Hello() {
       </button>
 
       <div className="timer-control-btns">
-        <button type="button" onClick={restartTimer}>
+        <button type="button" onClick={() => setModularModalKey('restart')}>
           Restart
         </button>
         <button type="button" onClick={pauseTimer}>
@@ -317,10 +391,10 @@ function Hello() {
         <button type="button" onClick={resumeTimer}>
           Resume
         </button>
-        <button type="button" onClick={skipTimer}>
+        <button type="button" onClick={() => setModularModalKey('skip')}>
           Skip
         </button>
-        <Modal />
+        {modularModal}
       </div>
     </div>
   );
