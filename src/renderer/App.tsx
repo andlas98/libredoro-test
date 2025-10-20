@@ -32,21 +32,6 @@ function Hello() {
   });
 
   let timerStatusMessage = '';
-  const stopTimerAlarmScript = {
-    title: '',
-    body: 'Would you like to stop the current timer?',
-    button1Text: 'Yes',
-  };
-  const restartTimerAlarmScript = {
-    title: '',
-    body: 'Would you like to restart the current timer?',
-    button1Text: 'Yes',
-  };
-  const exitTimerScript = {
-    title: '',
-    body: 'Would you like to exit? Doing so will stop the timer.',
-    button1Text: 'Yes',
-  };
 
   // const { timerIsPaused, setTimerIsPaused } = useState(false);
 
@@ -193,13 +178,15 @@ function Hello() {
     }
     setSeshATimer((prev) => updateTimerStatus(prev, false));
     setSeshBTimer((prev) => updateTimerStatus(prev, false));
-    setModularModalKey(null);
   }
 
   function skipTimer() {
     if (seshATimer.status === true || seshBTimer.status === true) {
       if (seshATimer.status === true && seshBTimer.status === false) {
         setSeshBTimer((prev) => updateTimerStatus(prev, true));
+        setSeshATimer((prev) =>
+          updateTimerCurrentTime(prev, seshATimer.setTime),
+        );
         setSeshATimer((prev) => updateTimerStatus(prev, false));
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
@@ -207,6 +194,9 @@ function Hello() {
         }
       } else if (seshATimer.status === false && seshBTimer.status === true) {
         setSeshATimer((prev) => updateTimerStatus(prev, true));
+        setSeshBTimer((prev) =>
+          updateTimerCurrentTime(prev, seshBTimer.setTime),
+        );
         setSeshBTimer((prev) => updateTimerStatus(prev, false));
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
@@ -253,25 +243,27 @@ function Hello() {
   // compute modal text values so props receive strings (not functions)
   const modalTitleText: string =
     modularModalKey === 'stop'
-      ? stopTimerAlarmScript.title || 'Stop current timer?'
+      ? 'Would you like to stop the current timer?'
       : modularModalKey === 'restart'
-        ? restartTimerAlarmScript.title || 'Restart current timer?'
+        ? 'Would you like to restart the current timer?'
         : modularModalKey === 'exit'
-          ? exitTimerScript.title || 'Exit?'
-          : '';
+          ? 'Would you like to exit? Doing so will stop the timer.'
+          : modularModalKey === 'skip'
+            ? 'Would you like to skip the current session?'
+            : '';
 
   const modalBodyText: string =
     modularModalKey === 'stop'
-      ? stopTimerAlarmScript.body
+      ? 'stopTimerAlarmScript.body'
       : modularModalKey === 'exit'
-        ? exitTimerScript.body
+        ? 'exitTimerScript.body'
         : '';
 
   const modalButton1Text: string =
     modularModalKey === 'stop'
-      ? stopTimerAlarmScript.button1Text || 'Yes'
+      ? 'Yes'
       : modularModalKey === 'exit'
-        ? exitTimerScript.button1Text || 'Yes'
+        ? 'Yes, exit'
         : 'Yes';
 
   const modularModal = (
@@ -288,6 +280,7 @@ function Hello() {
         if (modularModalKey === 'skip') {
           skipTimer();
         }
+        setModularModalKey(null);
       }}
       modalTitle={modalTitleText}
       modalBody={modalBodyText}
