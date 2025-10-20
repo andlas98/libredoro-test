@@ -177,7 +177,9 @@ function Hello() {
       intervalRef.current = null;
     }
     setSeshATimer((prev) => updateTimerStatus(prev, false));
+    setSeshATimer((prev) => updateTimerCurrentTime(prev, seshATimer.setTime));
     setSeshBTimer((prev) => updateTimerStatus(prev, false));
+    setSeshBTimer((prev) => updateTimerCurrentTime(prev, seshBTimer.setTime));
   }
 
   function skipTimer() {
@@ -386,6 +388,9 @@ function Hello() {
         </button>
         <button type="button" onClick={() => setModularModalKey('skip')}>
           Skip
+        </button>
+        <button type="button" onClick={() => setModularModalKey('stop')}>
+          Stop
         </button>
         {modularModal}
       </div>
