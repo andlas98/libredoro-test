@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-alert */
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { MemoryRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from './components/modal';
 import './App.css';
@@ -9,8 +9,10 @@ import PauseIcon from './components/icons/pauseIcon';
 import SkipIcon from './components/icons/skipIcon';
 import RestartIcon from './components/icons/restartIcon';
 import StopIcon from './components/icons/stopIcon';
+import SettingCog from './components/icons/settingCog';
+import Settings from './pages/Settings';
 
-function Hello() {
+function Main() {
   interface Timer {
     name: string;
     currentTime: string;
@@ -300,9 +302,12 @@ function Hello() {
   );
 
   const seshATimerHTML = (
-    <div id="session-a-timer">
-      <p className="text-red-100">{seshATimer.name}</p>
-      <h1>{seshATimer.currentTime}</h1>
+    <div
+      id="session-a-timer"
+      className="bg-[#222222] rounded-[8px] mr-[0.5rem] justify-center text-center p-3"
+    >
+      <p className="text-purple-700 font-bold">{seshATimer.name}</p>
+      <h1 className="text-white">{seshATimer.currentTime}</h1>
       <input
         type="number"
         min="0"
@@ -323,9 +328,12 @@ function Hello() {
   );
 
   const seshBTimerHTML = (
-    <div id="session-b-timer">
-      <p>{seshBTimer.name}</p>
-      <h1>{seshBTimer.currentTime}</h1>
+    <div
+      id="session-b-timer"
+      className="bg-[#222222] justify-center ml-[0.5rem] text-center p-3 rounded-[8px]"
+    >
+      <p className="text-white">{seshBTimer.name}</p>
+      <h1 className="text-white">{seshBTimer.currentTime}</h1>
       <input
         type="number"
         min="0"
@@ -425,7 +433,10 @@ function Hello() {
   return (
     <div>
       <p>{timerStatusMessage}</p>
-      <div className="timersDiv">
+      <Link to="/settings" className="m-auto" aria-label="Open settings">
+        <SettingCog />
+      </Link>
+      <div className="timersDiv flex">
         {((seshATimer.status !== false && seshBTimer.status === false) ||
           (seshATimer.status === false && seshBTimer.status === false)) &&
           seshATimerHTML}
@@ -436,7 +447,7 @@ function Hello() {
       </div>
       {seshATimer.status === false && seshBTimer.status === false && (
         <button
-          className="start-timer-btn text-white"
+          className="start-timer-btn text-white bg-[#222222] mt-[0.5rem]"
           type="button"
           onClick={startPomodoro}
         >
@@ -455,7 +466,8 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<Main />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Router>
   );
