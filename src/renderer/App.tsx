@@ -4,6 +4,11 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from './components/modal';
 import './App.css';
+import PlayIcon from './components/icons/playIcon';
+import PauseIcon from './components/icons/pauseIcon';
+import SkipIcon from './components/icons/skipIcon';
+import RestartIcon from './components/icons/restartIcon';
+import StopIcon from './components/icons/stopIcon';
 
 function Hello() {
   interface Timer {
@@ -294,21 +299,71 @@ function Hello() {
     />
   );
 
-  const timerControlBtns = (<div className="timer-control-btns">
+  const seshATimerHTML = (
+    <div id="session-a-timer">
+      <p className="text-red-100">{seshATimer.name}</p>
+      <h1>{seshATimer.currentTime}</h1>
+      <input
+        type="number"
+        min="0"
+        max="99"
+        name=""
+        id="session-a-minutes"
+        className="mr-2 w-10 h-10 rounded-sm text-white bg-gray-400"
+      />
+      <input
+        type="number"
+        min="0"
+        max="59"
+        name=""
+        className="text-white rounded-sm bg-gray-400"
+        id="session-a-seconds"
+      />
+    </div>
+  );
+
+  const seshBTimerHTML = (
+    <div id="session-b-timer">
+      <p>{seshBTimer.name}</p>
+      <h1>{seshBTimer.currentTime}</h1>
+      <input
+        type="number"
+        min="0"
+        max="99"
+        name=""
+        id="session-b-minutes"
+        className="mr-2 text-white bg-gray-400"
+      />
+      <input
+        className="text-white bg-gray-400"
+        type="number"
+        min="0"
+        max="59"
+        name=""
+        id="session-b-seconds"
+      />
+    </div>
+  );
+
+  const timerControlBtns = (
+    <div className="timer-control-btns">
       <button type="button" onClick={() => setModularModalKey('restart')}>
-        Restart
+        <RestartIcon />
       </button>
-      <button type="button" onClick={pauseTimer}>
-        Pause
-      </button>
-      <button type="button" onClick={resumeTimer}>
-        Resume
-      </button>
+      {seshATimer.status === 'paused' || seshBTimer.status === 'paused' ? (
+        <button type="button" onClick={resumeTimer}>
+          <PlayIcon />
+        </button>
+      ) : (
+        <button type="button" onClick={pauseTimer}>
+          <PauseIcon />
+        </button>
+      )}
       <button type="button" onClick={() => setModularModalKey('skip')}>
-        Skip
+        <SkipIcon />
       </button>
       <button type="button" onClick={() => setModularModalKey('stop')}>
-        Stop
+        <StopIcon />
       </button>
     </div>
   );
@@ -370,35 +425,24 @@ function Hello() {
   return (
     <div>
       <p>{timerStatusMessage}</p>
-      <div id="session-a-timer">
-        <p>{seshATimer.name}</p>
-        <h1>{seshATimer.currentTime}</h1>
-        <input
-          type="number"
-          min="0"
-          max="99"
-          name=""
-          id="session-a-minutes"
-          className="mr-2"
-        />
-        <input type="number" min="0" max="59" name="" id="session-a-seconds" />
+      <div className="timersDiv">
+        {((seshATimer.status !== false && seshBTimer.status === false) ||
+          (seshATimer.status === false && seshBTimer.status === false)) &&
+          seshATimerHTML}
+
+        {((seshATimer.status !== false && seshBTimer.status === true) ||
+          (seshATimer.status === false && seshBTimer.status === false)) &&
+          seshBTimerHTML}
       </div>
-      <div id="session-b-timer">
-        <p>{seshBTimer.name}</p>
-        <h1>{seshBTimer.currentTime}</h1>
-        <input
-          type="number"
-          min="0"
-          max="99"
-          name=""
-          id="session-b-minutes"
-          className="mr-2"
-        />
-        <input type="number" min="0" max="59" name="" id="session-b-seconds" />
-      </div>
-      <button className="start-timer-btn" type="button" onClick={startPomodoro}>
-        GO!
-      </button>
+      {seshATimer.status === false && seshBTimer.status === false && (
+        <button
+          className="start-timer-btn text-white"
+          type="button"
+          onClick={startPomodoro}
+        >
+          GO!
+        </button>
+      )}
 
       {timerControlBtnsAreVisible && timerControlBtns}
 

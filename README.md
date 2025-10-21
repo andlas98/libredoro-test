@@ -6,5 +6,6 @@ Libredoro is a timer application that uses the Pomodoro technique to help users 
 ## Technologies Used
 - React
 - TypeScript
-- Tailwind
+- Tailwind - Styling
 - ElectronJS via [electron-react-boilerplate](electron-react-boilerplate.js.org)
+- [Heroicons](https://heroicons.com/) for app icons
