@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import {
   Dialog,
   DialogBackdrop,
@@ -86,3 +87,10 @@ export default function Modal({
     </div>
   );
 }
+
+Modal.defaultProps = {
+  button1Text: 'Button 1 text',
+  onConfirm: () => {},
+  modalTitle: 'Modal Title',
+  modalBody: 'Modal Body',
+};

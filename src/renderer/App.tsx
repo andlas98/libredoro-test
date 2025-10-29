@@ -11,6 +11,7 @@ import RestartIcon from './components/icons/restartIcon';
 import StopIcon from './components/icons/stopIcon';
 import SettingCog from './components/icons/settingCog';
 import Settings from './pages/Settings';
+import settings from './settings.json';
 
 function Main() {
   interface Timer {
@@ -253,6 +254,11 @@ function Main() {
     'stop' | 'exit' | 'restart' | 'skip' | null
   >(null);
 
+  // read initial UI settings from JSON
+  const timerAColorFromSettings: string =
+    (settings as Record<string, string>)['Timer A Color'] || '#000';
+  const [timerAColor] = useState<string>(timerAColorFromSettings);
+
   // compute modal text values so props receive strings (not functions)
   const modalTitleText: string =
     modularModalKey === 'stop'
@@ -306,8 +312,12 @@ function Main() {
       id="session-a-timer"
       className="bg-[#222222] rounded-[8px] mr-[0.5rem] justify-center text-center p-3"
     >
-      <p className="text-purple-700 font-bold">{seshATimer.name}</p>
-      <h1 className="text-white">{seshATimer.currentTime}</h1>
+      <p className="timer-name font-bold" style={{ color: timerAColor }}>
+        {seshATimer.name}
+      </p>
+      <h1 className="timer-current-time text-white">
+        {seshATimer.currentTime}
+      </h1>
       <input
         type="number"
         min="0"
